@@ -5,7 +5,7 @@ var app = {
     this.handleSubmit();
     this.render();
   },
-  render: function() {
+  render: function() { 
     this.fetch();
   },
   send: function(message) {
@@ -31,7 +31,7 @@ var app = {
       // This is the url you should use to communicate with the parse API server.
       url: 'http://parse.sfm8.hackreactor.com/chatterbox/classes/messages',
       type: 'GET',
-      data: 'limit=1000',
+      data: {'order': '-createdAt', 'limit': '100'},
       contentType: 'application/json',
       success: function (data) {
         app.renderMessages(data.results);
@@ -45,11 +45,11 @@ var app = {
     });
   }, 
   clearMessages: function() {
-    $('#chats').empty();
+    $('#chats ul').empty();
   },
   renderMessage: function(message) {
-    var $message = $(`<div> <span class='username'> ${message.username} </span>: ${message.text} </div>`);
-    $('#chats').append($message);
+    var $message = $(`<li><span class='username'> ${message.username} </span>: ${message.text}</li>`);
+    $('#chats ul').append($message);
   }, 
   renderRoom: function(container) {
     $('#roomSelect').append(`<option value='${container}'> ${container} </option>`);
@@ -58,19 +58,22 @@ var app = {
     $('.username').on('click', function() {});
   }, 
   handleSubmit: function() {
+    var app = this;
     $('#send .submit').on('click', function() {
       // craft message obj
       var message = {
+        // search for the inputted text
         username: window.location.search.split('=')[1],
         text: $('#send input').val(),
         roomname: $('#roomSelect').val()
-        
       };
       
-      // search for the inputted text
+      $('#chats ul').prepend(message);
       // make the AJAX call 
-      // push to the server
+      app.send(message);
+      app.render();
       // clear input 
+      $('#send input').val('');
     });
   }, 
   renderMessages: function(messagesArr) {
