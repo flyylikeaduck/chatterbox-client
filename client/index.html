@@ -4,9 +4,11 @@
     <meta charset="utf-8">
     <title>chatterbox</title>
     <link rel="stylesheet" href="styles/styles.css">
-
+    <!-- <link rel='stylesheet' href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css"> -->
     <!-- dependencies -->
     <script src="bower_components/jquery/dist/jquery.js"></script>
+    <script src="bower_components/underscore/underscore-min.js"></script>
+    <!-- <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script> -->
     <script>
       // YOU DO NOT NEED TO EDIT THIS CODE
       if (!/(&|\?)username=/.test(window.location.search)) {
@@ -21,10 +23,17 @@
     <!-- your scripts -->
     <script src="env/config.js"></script>
     <script src="scripts/app.js"></script>
+    <script src="scripts/util.js"></script>
   </head>
   <body>
     <div id="main">
       <h1>chatterbox</h1>
+      <span>Room:</span>
+      <select class='dropdown-menu' name='rooms' id='roomSelect'></select>
+      <form id='send'>
+        <input type="text" name="message" />
+        <button class='submit'>Submit</button>
+      </form>
       <!-- Your HTML goes here! -->
     </div>
     <div id="chats"></div>
