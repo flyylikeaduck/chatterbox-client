@@ -47,5 +47,8 @@ var util = {
   },
   safeTagsReplace: function(str) {
     return str.replace(/[&<>]/g, this.replaceTag);
+  },
+  safeClassNames: function(str) {
+    return str.replace('.', 'period').replace('#', 'hash').split(' ').join('-');
   }
 };

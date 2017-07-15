@@ -1,5 +1,6 @@
 // YOUR CODE HERE:
 var app = {
+  friends: [],
   init: function() {
     this.bindEvents();
     this.render();
@@ -62,12 +63,22 @@ var app = {
     if (!message.roomname) {
       message.roomname = '';
     }
-    var $message = $(`<li class="${message.roomname.replace('.', 'period').replace('#', 'hash').split(' ').join('-')}"><span class='username'>${message.username}</span>: ${message.text}</li>`);
+    // adding roomname & username class to li for easier filter functionality
+    var $message = $(`<li class="${util.safeClassNames(message.roomname)}" data-username="${util.safeClassNames(message.username)}"><span class='username'>${message.username}</span>: ${message.text}</li>`);
     $('#chats ul').append($message);
   }, 
   handleUsernameClick: function() {
-    $('.username').on('click', function() {});
+    var app = this;
+    //event delegation for dynamically generated texts
+    $('#chats').on('click', '.username', function() {
+      // $(this) = span of whatever was clicked
+      var username = $(this).parent().data('username');
+      $(`li[data-username=${username}]`).toggleClass('friend');
+      // push to this.friends array
+      // app.friends.push(username);
+    });
   }, 
+
   handleRoomChange: function() {
     var app = this;
     $('#roomSelect').on('change', function() {
@@ -88,17 +99,13 @@ var app = {
         roomname: $('#roomSelect option:selected').text()
       };
       
-      
-      //$('#chats ul').prepend(message);
       // make the AJAX call 
       app.send(message);
       app.clearMessages();
       $('#chats ul').ready(function() {
         app.fetch();
       });
-      // clear input 
       $('#send input').val('');
-    
     });
   }, 
   renderMessages: function(messagesArr) {
@@ -113,7 +120,6 @@ var app = {
       if (message.roomname === undefined || message.roomname === null) {
         message.roomname = '';
       }
-      
 
       message.username = util.safeTagsReplace(message.username);
       message.text = util.safeTagsReplace(message.text);
@@ -162,13 +168,7 @@ var app = {
       // window.location.search += `&room=${room}`;
     });
   }
-  // setSelectedRoom: function(room) {
-  //   $('#roomSelect').find(`option[value="${room}"]`).attr('selected', 'selected').change();
-  // }
-  
-  
-  // add our submission with that new roomname
-  
+
   
   // click userName and add friend
   
