@@ -12,6 +12,8 @@ var app = {
     this.handleUsernameClick();
     this.handleRoomChange();
     this.handleSubmit();
+    this.handleShowAllRooms();
+    this.handleCreateRoom();
   },
   send: function(message) {
     $.ajax({
@@ -41,8 +43,10 @@ var app = {
       success: function (data) {
         app.renderMessages(data.results);
         app.renderRooms(data.results);
-        app.filterRooms($('#roomSelect').val());
+        var currentRoom = localStorage.currentRoom.replace(/"/g, '');
+        app.filterRooms(currentRoom);
         util.store('messages', data.results);
+        $('#roomSelect').find(`option[value="${currentRoom}"]`).attr('selected', 'selected').change();
       },
       error: function (data) {
         // See: https://developer.mozilla.org/en-US/docs/Web/API/console.error
@@ -58,7 +62,7 @@ var app = {
     if (!message.roomname) {
       message.roomname = '';
     }
-    var $message = $(`<li class="${message.roomname.split(' ').join('-')}"><span class='username'>${message.username}</span>: ${message.text}</li>`);
+    var $message = $(`<li class="${message.roomname.replace('.', 'period').replace('#', 'hash').split(' ').join('-')}"><span class='username'>${message.username}</span>: ${message.text}</li>`);
     $('#chats ul').append($message);
   }, 
   handleUsernameClick: function() {
@@ -67,7 +71,9 @@ var app = {
   handleRoomChange: function() {
     var app = this;
     $('#roomSelect').on('change', function() {
-      app.filterRooms($(this).val());
+      var room = $(this).val();
+      app.filterRooms(room);
+      util.store('currentRoom', room);
       $('#send input').focus();
     });
   },
@@ -82,6 +88,7 @@ var app = {
         roomname: $('#roomSelect option:selected').text()
       };
       
+      
       //$('#chats ul').prepend(message);
       // make the AJAX call 
       app.send(message);
@@ -89,9 +96,9 @@ var app = {
       $('#chats ul').ready(function() {
         app.fetch();
       });
-      
       // clear input 
       $('#send input').val('');
+    
     });
   }, 
   renderMessages: function(messagesArr) {
@@ -102,9 +109,15 @@ var app = {
       if (message.text === undefined || message.text === null) {
         message.text = '';
       }
+      
+      if (message.roomname === undefined || message.roomname === null) {
+        message.roomname = '';
+      }
+      
 
       message.username = util.safeTagsReplace(message.username);
       message.text = util.safeTagsReplace(message.text);
+      message.roomname = util.safeTagsReplace(message.roomname);
       this.renderMessage(message);
     });
   },
@@ -118,9 +131,9 @@ var app = {
       }
       return roomArr;
     }, [])
-    .map(roomname => `<option value="${roomname.split(' ').join('-')}">${roomname}</option>`)
+    .sort()
+    .map(roomname => `<option value="${roomname.replace('.', 'period').replace('#', 'hash').split(' ').join('-')}">${roomname}</option>`)
     .join('');
-
     
     $('#roomSelect').append(results);
   },
@@ -128,6 +141,40 @@ var app = {
     // filter messages to appear when room is clicked
     $(`.${room}`).show();
     $(`#chats li:not(.${room})`).hide();
+  },
+  
+  // see all chats (maybe button?)
+  handleShowAllRooms: function() {
+    $('.showAll').on('click', function() {
+      $('#chats li').show();
+    });
+  },
+  // create new room button  with prompt
+  handleCreateRoom: function() {
+    var app = this;
+    $('.createRoom').on('click', function() {
+      var room = prompt('What is the room name?');
+      // set new room as selected room
+      $('#roomSelect').prepend(`<option selected value="${room.split(' ').join('-')}">${room}</option>`);
+      
+      //app.setSelectedRoom(room);
+      util.store('currentRoom', room);
+      // window.location.search += `&room=${room}`;
+    });
   }
+  // setSelectedRoom: function(room) {
+  //   $('#roomSelect').find(`option[value="${room}"]`).attr('selected', 'selected').change();
+  // }
+  
+  
+  // add our submission with that new roomname
+  
+  
+  // click userName and add friend
+  
+  // display all messages sent by friends in bold (or some other indicator --- <3 symbol?)
+  
+  
+
   
 };

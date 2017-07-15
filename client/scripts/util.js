@@ -4,7 +4,8 @@ var ESCAPE_KEY = 27;
 var tagsToReplace = {
   '&': '&amp;',
   '<': '&lt;',
-  '>': '&gt;'
+  '>': '&gt;',
+  '.': '2e'
 };
 
 var util = {
