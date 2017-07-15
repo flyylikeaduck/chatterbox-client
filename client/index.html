@@ -30,12 +30,15 @@
       <h1>chatterbox</h1>
       <span>Room:</span>
       <select class='dropdown-menu' name='rooms' id='roomSelect'></select>
-      <form id='send'>
+      <div id='send'>
         <input type="text" name="message" />
         <button class='submit'>Submit</button>
-      </form>
+      </div>
       <!-- Your HTML goes here! -->
     </div>
     <div id="chats"></div>
+    <script type="text/javascript">
+      app.init();
+    </script>
   </body>
 </html>

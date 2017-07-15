@@ -46,13 +46,15 @@ body {
     line-height: 13px;
 }
 
-form {
+form,
+#send {
     padding: 20px;
     padding-left: 0;
     margin-bottom: 20px;
 }
 
-form input[type=text] {
+form input[type=text],
+#send input {
     margin-right: 10px;
     width: 70%;
     font-size: 12px;
