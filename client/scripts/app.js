@@ -1,12 +1,17 @@
 // YOUR CODE HERE:
 var app = {
   init: function() {
-    this.handleUsernameClick();
-    this.handleSubmit();
+    this.bindEvents();
     this.render();
   },
   render: function() { 
+    this.clearMessages();
     this.fetch();
+  },
+  bindEvents: function() {
+    this.handleUsernameClick();
+    this.handleRoomChange();
+    this.handleSubmit();
   },
   send: function(message) {
     $.ajax({
@@ -36,6 +41,7 @@ var app = {
       success: function (data) {
         app.renderMessages(data.results);
         app.renderRooms(data.results);
+        app.filterRooms($('#roomSelect').val());
         util.store('messages', data.results);
       },
       error: function (data) {
@@ -46,17 +52,25 @@ var app = {
   }, 
   clearMessages: function() {
     $('#chats ul').empty();
+    $('#roomSelect').empty();
   },
   renderMessage: function(message) {
-    var $message = $(`<li><span class='username'> ${message.username} </span>: ${message.text}</li>`);
+    if (!message.roomname) {
+      message.roomname = '';
+    }
+    var $message = $(`<li class="${message.roomname.split(' ').join('-')}"><span class='username'>${message.username}</span>: ${message.text}</li>`);
     $('#chats ul').append($message);
-  }, 
-  renderRoom: function(container) {
-    $('#roomSelect').append(`<option value='${container}'> ${container} </option>`);
   }, 
   handleUsernameClick: function() {
     $('.username').on('click', function() {});
   }, 
+  handleRoomChange: function() {
+    var app = this;
+    $('#roomSelect').on('change', function() {
+      app.filterRooms($(this).val());
+      $('#send input').focus();
+    });
+  },
   handleSubmit: function() {
     var app = this;
     $('#send .submit').on('click', function() {
@@ -65,13 +79,17 @@ var app = {
         // search for the inputted text
         username: window.location.search.split('=')[1],
         text: $('#send input').val(),
-        roomname: $('#roomSelect').val()
+        roomname: $('#roomSelect option:selected').text()
       };
       
-      $('#chats ul').prepend(message);
+      //$('#chats ul').prepend(message);
       // make the AJAX call 
       app.send(message);
-      app.render();
+      app.clearMessages();
+      $('#chats ul').ready(function() {
+        app.fetch();
+      });
+      
       // clear input 
       $('#send input').val('');
     });
@@ -92,7 +110,7 @@ var app = {
   },
   renderRooms: function(messagesArr) {
     var results = messagesArr.reduce(function(roomArr, message) {
-      if (message.roomname !== undefined && message.roomname !== null && message.roomname !== '') {
+      if (message.roomname !== undefined && message.roomname !== null && (message.roomname).trim() !== '') {
         if (roomArr.indexOf(message.roomname) < 0) {
           message.roomname = util.safeTagsReplace(message.roomname);
           roomArr.push(message.roomname);
@@ -100,9 +118,16 @@ var app = {
       }
       return roomArr;
     }, [])
-    .map(roomname => `<option value="${roomname}"> ${roomname} </option>`)
-    .join(',');
+    .map(roomname => `<option value="${roomname.split(' ').join('-')}">${roomname}</option>`)
+    .join('');
+
     
     $('#roomSelect').append(results);
+  },
+  filterRooms: function(room) {
+    // filter messages to appear when room is clicked
+    $(`.${room}`).show();
+    $(`#chats li:not(.${room})`).hide();
   }
+  
 };
