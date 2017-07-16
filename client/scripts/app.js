@@ -1,6 +1,5 @@
 // YOUR CODE HERE:
 var app = {
-  friends: [],
   init: function() {
     this.bindEvents();
     this.render();
@@ -15,6 +14,7 @@ var app = {
     this.handleSubmit();
     this.handleShowAllRooms();
     this.handleCreateRoom();
+    this.handleShowFriends();
   },
   send: function(message) {
     $.ajax({
@@ -73,7 +73,8 @@ var app = {
     $('#chats').on('click', '.username', function() {
       // $(this) = span of whatever was clicked
       var username = $(this).parent().data('username');
-      $(`li[data-username=${username}]`).toggleClass('friend');
+      // grabbing all li elements with matching data-username
+      $(`li[data-username="${username}"]`).toggleClass('friend');
       // push to this.friends array
       // app.friends.push(username);
     });
@@ -167,14 +168,14 @@ var app = {
       util.store('currentRoom', room);
       // window.location.search += `&room=${room}`;
     });
+  },
+  handleShowFriends: function() {
+    $('.showFriends').on('click', function() {
+      $('li.friend').show();
+      $('li:not(.friend)').hide();
+    });
   }
-
-  
-  // click userName and add friend
-  
-  // display all messages sent by friends in bold (or some other indicator --- <3 symbol?)
-  
   
 
-  
+
 };
